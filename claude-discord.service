@@ -15,6 +15,14 @@ Wants=network-online.target
 
 [Service]
 Type=simple
+
+# IMPORTANT: If ENABLE_TOOLS=true, you MUST run as a non-root user.
+# --dangerously-skip-permissions is blocked for root/sudo.
+# Create a dedicated user: useradd -m -s /bin/bash claudebot
+# Then set User/Group below and ensure claudebot has access to your working directory.
+# User=claudebot
+# Group=claudebot
+
 WorkingDirectory=/path/to/claude-code-discord-manager
 ExecStart=/usr/bin/python3 /path/to/claude-code-discord-manager/bridge.py
 Restart=on-failure

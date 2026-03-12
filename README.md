@@ -110,7 +110,45 @@ All config is via environment variables (`.env` file):
 | `SUPERVISOR_COOLDOWN` | No | `30` | Seconds between supervisor checks |
 | `MEMORY_DIR` | No | — | Path to Claude Code memory directory |
 | `CLAUDE_CWD` | No | `~` | Working directory for claude CLI |
-| `CLAUDE_TIMEOUT` | No | `300` | CLI response timeout (seconds) |
+| `CLAUDE_TIMEOUT` | No | `1800` | CLI response timeout (seconds) |
+| `ENABLE_TOOLS` | No | `false` | Enable tool execution (requires non-root) |
+
+## Tool Execution Mode
+
+By default, `claude --print` runs in text-only mode — it thinks and responds but can't execute tools (Bash, Read, Edit, Write, etc.). Enable tool execution to give your Discord bot the same capabilities as interactive Claude Code:
+
+```bash
+# In your .env file
+ENABLE_TOOLS=true
+CLAUDE_TIMEOUT=1800  # 30 min — tool-using tasks take longer
+```
+
+**Important:** `--dangerously-skip-permissions` (required for tool execution) is blocked when running as root. You must create a dedicated non-root user:
+
+```bash
+# Create dedicated user
+useradd -m -s /bin/bash claudebot
+
+# Copy Claude Code auth
+cp -r ~/.claude /home/claudebot/.claude
+chown -R claudebot:claudebot /home/claudebot/.claude
+
+# Restore config if needed
+cp /home/claudebot/.claude/backups/.claude.json.backup.* /home/claudebot/.claude.json
+
+# Give access to your working directory
+chmod o+rx /your/project/dir
+# ... grant access to any directories Claude needs to read/write
+
+# Update systemd service
+# Uncomment User=claudebot and Group=claudebot in claude-discord.service
+```
+
+With tools enabled, your Discord bot can:
+- Run shell commands (scripts, system tools, git, docker)
+- Read, write, and edit files
+- Search codebases (grep, glob)
+- Execute Python scripts, API calls, and more
 
 ## Worker Bot Supervision
 
