@@ -61,9 +61,8 @@ SUPERVISOR_COOLDOWN = int(os.environ.get('SUPERVISOR_COOLDOWN', '30'))
 # Claude CLI timeout (seconds) — default 1800 (30 min) for tool-using tasks
 CLAUDE_TIMEOUT = int(os.environ.get('CLAUDE_TIMEOUT', '1800'))
 
-# Enable tool execution (Bash, Read, Edit, Write, etc.) — requires non-root user
-# Set to "true" to add --dangerously-skip-permissions flag to claude CLI
-ENABLE_TOOLS = os.environ.get('ENABLE_TOOLS', 'false').lower() == 'true'
+# Tool execution is always enabled — Claude Code runs with full capabilities
+# Requires non-root user (e.g. claudebot with sudo access)
 
 # ─── INTERNAL STATE ───
 
@@ -371,9 +370,7 @@ def claude_print(prompt, model='sonnet', session_id=None, is_resume=False,
     env = os.environ.copy()
     env.pop('ANTHROPIC_API_KEY', None)  # Force Max/Pro subscription — zero API cost
 
-    cmd = ['claude', '--print']
-    if ENABLE_TOOLS:
-        cmd.append('--dangerously-skip-permissions')
+    cmd = ['claude', '--print', '--dangerously-skip-permissions']
     cmd.extend(['--model', model])
 
     # Session management — resume existing or start new
