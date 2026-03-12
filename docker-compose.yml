@@ -1,0 +1,15 @@
+services:
+  claude-discord:
+    build: .
+    container_name: claude-discord-manager
+    restart: unless-stopped
+    stop_grace_period: 10s
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./shared-brain:/app/shared-brain
+      # Mount your home directory for Claude Code CLI access
+      # Adjust these paths based on your setup:
+      - ~/.claude:/root/.claude
+      # Optional: mount CLAUDE.md for auto-context
+      # - ~/CLAUDE.md:/root/CLAUDE.md:ro

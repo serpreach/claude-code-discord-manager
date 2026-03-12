@@ -1,0 +1,30 @@
+# Systemd service file for running directly on host (recommended)
+# Copy to: /etc/systemd/system/claude-discord.service
+#
+# Then:
+#   systemctl daemon-reload
+#   systemctl enable claude-discord
+#   systemctl start claude-discord
+#
+# Logs: journalctl -u claude-discord -f
+
+[Unit]
+Description=Claude Code Discord Manager
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/path/to/claude-code-discord-manager
+ExecStart=/usr/bin/python3 /path/to/claude-code-discord-manager/bridge.py
+Restart=on-failure
+RestartSec=10
+
+# Load environment from .env file
+EnvironmentFile=/path/to/claude-code-discord-manager/.env
+
+# Ensure Claude Code CLI can find your home directory
+Environment=HOME=/root
+
+[Install]
+WantedBy=multi-user.target
